@@ -142,6 +142,10 @@ const pack = {
   } // finish pack object
 
 
-app.get('/default', (req, resp) => resp.json(pack));
+app.get('/default', (req, resp) => {
+  // temporarily bypass cors.
+  resp.header('Access-Control-Allow-Origin', '*');
+  resp.json(pack)
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`));
