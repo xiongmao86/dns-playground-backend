@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express'
 
 const app = express();
 const port = 3000;
@@ -139,7 +139,6 @@ const pack = {
       }
     ]
   } // finish pack object
-
 
 app.get('/default', (req, resp) => {
   // temporarily bypass cors.
