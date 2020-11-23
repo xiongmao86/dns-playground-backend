@@ -15,6 +15,12 @@ class Parser {
         return result;
     }
 
+    // readUInt8() {
+    //     let result = this.buffer.readUInt8BE(this.i);
+    //     this.i += 1;
+    //     return result;
+    // }
+
     parse_flags(flagbits) {
         let qr = flagbits >>> 15;
         let opcode = flagbits >>> 11 & 0b1111;
@@ -41,15 +47,33 @@ class Parser {
         }
     }
 
+    // parse_query() {
+    //     let n = this.readUInt8();
+        
+    // }
+
     parse() {
         let id = "0x" + this.readUInt16().toString(16).padStart(4, '0');
     
         let flagbits = this.readUInt16();
         let flags = this.parse_flags(flagbits);
+        let query_count = this.readUInt16();
+        let answer_count = this.readUInt16();
+        let authority_count = this.readUInt16();
+        let additional_information_count = this.readUInt16();
+
+        let querys = [];
+        for(i in [...query_count]) {
+            querys[i] = this.parse_query();
+        }
 
         return {
             id,
-            flags
+            flags,
+            query_count,
+            answer_count,
+            authority_count,
+            additional_information_count
         }
     }
 }

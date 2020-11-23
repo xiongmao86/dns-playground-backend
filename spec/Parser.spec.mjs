@@ -31,6 +31,13 @@ describe("Parser", () => {
         expect(flags.error_code).toBe(0);
     })
 
+    it("should parse counts", () => {
+        expect(result.query_count).toBe(1);
+        expect(result.answer_count).toBe(3);
+        expect(result.authority_count).toBe(5);
+        expect(result.additional_information_count).toBe(5);
+    })
+    
     // it("should parse counts", () => {
     //     expect(result.query_count).toBe(1);
     // })
