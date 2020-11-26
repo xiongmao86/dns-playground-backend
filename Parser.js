@@ -15,11 +15,11 @@ class Parser {
         return result;
     }
 
-    // readUInt8() {
-    //     let result = this.buffer.readUInt8BE(this.i);
-    //     this.i += 1;
-    //     return result;
-    // }
+    readUInt8() {
+        let result = this.buffer.readUInt8(this.i);
+        this.i += 1;
+        return result;
+    }
 
     parse_flags(flagbits) {
         let qr = flagbits >>> 15;
@@ -47,6 +47,25 @@ class Parser {
         }
     }
 
+    parse_query_name() {
+        let labels = [];
+        while(true) {
+            let n = this.readUInt8();
+            if (n === 0) break;
+            let label = this.parse_query_label(n);
+            labels.push(label);
+        }
+        return labels;
+    }
+
+    parse_query_label(n) {
+        let end = this.i + n;
+        let label = this.buffer.toString('ascii', this.i, end);
+        this.i = end;
+        
+        return label;
+    }
+
     // parse_query() {
     //     let n = this.readUInt8();
         
@@ -62,10 +81,13 @@ class Parser {
         let authority_count = this.readUInt16();
         let additional_information_count = this.readUInt16();
 
-        let querys = [];
-        for(i in [...query_count]) {
-            querys[i] = this.parse_query();
-        }
+        // let querys = [];
+        // for(i in [...query_count]) {
+        //     querys[i] = this.parse_query();
+        // }
+
+        // test
+        let qname = this.parse_query_name();
 
         return {
             id,
@@ -73,7 +95,7 @@ class Parser {
             query_count,
             answer_count,
             authority_count,
-            additional_information_count
+            additional_information_count,
         }
     }
 }
