@@ -11,12 +11,9 @@ describe("Parser", () => {
             parser = new Parser(binData);
             result = parser.parse();
         })
+
         it("Setup successful.", () => {
             expect(parser.bufferLength()).toBe(260);
-        })
-        
-        it("should parse id", () => {
-            expect(result.id).toBe("0x867f");
         })
         
         it("should parse flags", () => {
@@ -49,6 +46,13 @@ describe("Parser", () => {
         })
     })
     
+    it("should parse id", () => {
+        let u16 = [ 0x86, 0x7f];
+        let buf = Buffer.from(u16);
+        let p = new Parser(buf);;
+        expect(p.parse_id()).toBe("0x867f");
+    })
+
     it("should parse label", () => {
         let www = Buffer.from('www');
         let p1 = new Parser(www);

@@ -79,8 +79,12 @@ class Parser {
         };
     }
 
+    parse_id() {
+        return "0x" + this.readUInt16().toString(16).padStart(4, '0');
+    }
+
     parse() {
-        let id = "0x" + this.readUInt16().toString(16).padStart(4, '0');
+        let id = this.parse_id();
     
         let flagbits = this.readUInt16();
         let flags = this.parse_flags(flagbits);
