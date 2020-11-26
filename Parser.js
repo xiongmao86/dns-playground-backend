@@ -21,7 +21,8 @@ class Parser {
         return result;
     }
 
-    parse_flags(flagbits) {
+    parse_flags() {
+        let flagbits = this.readUInt16();
         let qr = flagbits >>> 15;
         let opcode = flagbits >>> 11 & 0b1111;
         let aa = flagbits >>> 10 & 1;
@@ -86,8 +87,7 @@ class Parser {
     parse() {
         let id = this.parse_id();
     
-        let flagbits = this.readUInt16();
-        let flags = this.parse_flags(flagbits);
+        let flags = this.parse_flags();
         let query_count = this.readUInt16();
         let answer_count = this.readUInt16();
         let authority_count = this.readUInt16();
