@@ -66,10 +66,18 @@ class Parser {
         return label;
     }
 
-    // parse_query() {
-    //     let n = this.readUInt8();
-        
-    // }
+    parse_query() {
+        let qname = this.parse_query_name().join('.');
+        let qtype = this.readUInt16();
+        let qclass = this.readUInt16();
+
+        return {
+            name: qname,
+            // will translate with type name
+            type: qtype == 1 ? "A" : qtype,
+            klass: qclass == 1 ? "IN" : qclass
+        };
+    }
 
     parse() {
         let id = "0x" + this.readUInt16().toString(16).padStart(4, '0');
@@ -81,13 +89,10 @@ class Parser {
         let authority_count = this.readUInt16();
         let additional_information_count = this.readUInt16();
 
-        // let querys = [];
-        // for(i in [...query_count]) {
-        //     querys[i] = this.parse_query();
-        // }
-
-        // test
-        let qname = this.parse_query_name();
+        let querys = [];
+        for(let i = 0; i < query_count; i++) {
+            querys.push(this.parse_query());
+        }
 
         return {
             id,
@@ -96,6 +101,7 @@ class Parser {
             answer_count,
             authority_count,
             additional_information_count,
+            querys
         }
     }
 }

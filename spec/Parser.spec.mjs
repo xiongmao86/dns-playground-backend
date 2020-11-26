@@ -2,6 +2,7 @@ import fs from 'fs';
 import Parser from '../Parser.js'
 
 describe("Parser", () => {
+    // TODO will decouple dependencies of this.
     describe("parsing header", () => {
         let parser;
         let result;
@@ -37,6 +38,14 @@ describe("Parser", () => {
             expect(result.answer_count).toBe(3);
             expect(result.authority_count).toBe(5);
             expect(result.additional_information_count).toBe(5);
+        })
+
+        it("should parse querys", () => {
+            expect(result.querys.length).toBe(1);
+            let query = result.querys[0];
+            expect(query.name).toBe('www.baidu.com');
+            expect(query.type).toBe('A');
+            expect(query.klass).toBe('IN');
         })
     })
     
