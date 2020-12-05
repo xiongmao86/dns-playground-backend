@@ -15,13 +15,6 @@ describe("Parser", () => {
         it("Setup successful.", () => {
             expect(parser.bufferLength()).toBe(260);
         })
-        
-        it("should parse counts", () => {
-            expect(result.query_count).toBe(1);
-            expect(result.answer_count).toBe(3);
-            expect(result.authority_count).toBe(5);
-            expect(result.additional_information_count).toBe(5);
-        })
 
         it("should parse querys", () => {
             expect(result.querys.length).toBe(1);
@@ -30,6 +23,15 @@ describe("Parser", () => {
             expect(query.type).toBe('A');
             expect(query.klass).toBe('IN');
         })
+    })
+
+    it("should parse counts", () => {
+        let qc = Buffer.from([0x00, 0x01]);
+        let ac = Buffer.from([0x00, 0x03]);
+        let auc = Buffer.from([0x00, 0x05]);
+        expect(new Parser(qc).readUInt16()).toBe(1);
+        expect(new Parser(ac).readUInt16()).toBe(3);
+        expect(new Parser(auc).readUInt16()).toBe(5);
     })
     
     it("should parse id", () => {
