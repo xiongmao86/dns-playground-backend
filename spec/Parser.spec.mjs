@@ -15,14 +15,6 @@ describe("Parser", () => {
         it("Setup successful.", () => {
             expect(parser.bufferLength()).toBe(260);
         })
-
-        it("should parse querys", () => {
-            expect(result.querys.length).toBe(1);
-            let query = result.querys[0];
-            expect(query.name).toBe('www.baidu.com');
-            expect(query.type).toBe('A');
-            expect(query.klass).toBe('IN');
-        })
     })
 
     it("should parse counts", () => {
@@ -79,9 +71,32 @@ describe("Parser", () => {
         buf.write('baidu',5, 'ascii');
         buf[10] = 3;
         buf.write('com', 11, 'ascii');
-        buf[15] = 0;
+        buf[14] = 0;
 
         let p = new Parser(buf);
         expect(p.parse_query_name()).toEqual(['www', 'baidu', 'com']);
+    })
+
+    it("should parse query", () => {
+        let buf = Buffer.alloc(19);
+        buf[0] = 3;
+        buf.write('www', 1, 'ascii');
+        buf[4] = 5;
+        buf.write('baidu',5, 'ascii');
+        buf[10] = 3;
+        buf.write('com', 11, 'ascii');
+        buf[14] = 0;
+        // qtype
+        buf[15] = 0x00;
+        buf[16] = 0x01;
+        // qclass
+        buf[17] = 0x00;
+        buf[18] = 0x01;
+
+        let query = new Parser(buf).parse_query();
+
+        expect(query.name).toBe('www.baidu.com');
+        expect(query.type).toBe('A');
+        expect(query.klass).toBe('IN');
     })
 })
