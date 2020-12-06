@@ -1,3 +1,5 @@
+import assert from 'assert';
+
 class Parser {
     constructor(buffer) {
         this.buffer = buffer;
@@ -57,6 +59,12 @@ class Parser {
             labels.push(label);
         }
         return labels;
+    }
+
+    parse_name_pointer() {
+        let pointer = this.readUInt16();
+        assert(pointer & 0b1100_0000_0000_0000, "should start with 0b11");
+        return pointer & 0b0011_1111_1111_1111;
     }
 
     parse_query_label(n) {

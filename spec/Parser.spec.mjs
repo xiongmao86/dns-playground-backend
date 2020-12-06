@@ -99,4 +99,9 @@ describe("Parser", () => {
         expect(query.type).toBe('A');
         expect(query.klass).toBe('IN');
     })
+
+    it("should parse with pointer", () => {
+        let buf = Buffer.from([0xc0, 0x0c]);
+        expect(new Parser(buf).parse_name_pointer()).toBe(0x0c);
+    })
 })
