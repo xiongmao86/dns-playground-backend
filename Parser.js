@@ -11,6 +11,12 @@ class Parser {
         return buffer? buffer.length : 0;
     }
 
+    readUInt32() {
+        let result = this.buffer.readUInt32BE(this.i);
+        this.i += 4;
+        return result;
+    }
+
     readUInt16() {
         let result = this.buffer.readUInt16BE(this.i);
         this.i += 2;
@@ -20,6 +26,14 @@ class Parser {
     readUInt8() {
         let result = this.buffer.readUInt8(this.i);
         this.i += 1;
+        return result;
+    }
+
+    getRange(len) {
+        let end = this.i + len;
+        let result = this.buffer.slice(this.i, end);
+        this.i = end;
+
         return result;
     }
 
@@ -68,9 +82,8 @@ class Parser {
     }
 
     parse_query_label(n) {
-        let end = this.i + n;
-        let label = this.buffer.toString('ascii', this.i, end);
-        this.i = end;
+        let range = this.getRange(n);
+        let label = range.toString();
         
         return label;
     }
@@ -105,6 +118,16 @@ class Parser {
             klass: qclass
         };
     }
+
+    // parse_resource_record() {
+    //     let rname = this.parse_query_name().join('.');
+    //     let rtype = this.parse_type();
+    //     let rclass = this.parse_class();
+    //     let ttl = this.readUInt32();
+    //     let rd_length = this.readUInt16();
+
+    //     let rdata = this.buffer.slice(this.i, this.i + rd_length)
+    // }
 
     parse_id() {
         return "0x" + this.readUInt16().toString(16).padStart(4, '0');
