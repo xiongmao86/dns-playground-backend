@@ -75,15 +75,27 @@ class Parser {
         return label;
     }
 
+    parse_type() {
+        let type = this.readUInt16();
+        switch(type) {
+            case 1:
+                return "A";
+            case 5:
+                return "CNAME";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
     parse_query() {
         let qname = this.parse_query_name().join('.');
-        let qtype = this.readUInt16();
+        let qtype = this.parse_type();
         let qclass = this.readUInt16();
 
         return {
             name: qname,
             // will translate with type name
-            type: qtype == 1 ? "A" : qtype,
+            type: qtype,
             klass: qclass == 1 ? "IN" : qclass
         };
     }

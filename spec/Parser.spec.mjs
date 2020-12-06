@@ -104,4 +104,12 @@ describe("Parser", () => {
         let buf = Buffer.from([0xc0, 0x0c]);
         expect(new Parser(buf).parse_name_pointer()).toBe(0x0c);
     })
+
+    it("should parse type", () => {
+        let type_a = Buffer.from([0x00, 0x01]);
+        expect(new Parser(type_a).parse_type()).toBe('A');
+
+        let type_cname = Buffer.from([0x00, 0x05]);
+        expect(new Parser(type_cname).parse_type()).toBe('CNAME');
+    })
 })
