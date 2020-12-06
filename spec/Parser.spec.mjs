@@ -63,6 +63,22 @@ describe("Parser", () => {
         expect(p3.parse_query_label(3)).toBe('com');
     })
 
+    it("should get pointee", () => {
+        let p = new Parser();
+        p.pointees.push({
+            pos: 0,
+            name: 'www.baidu.com'
+        });
+        p.pointees.push({
+            pos: 4,
+            name: 'baidu.com'
+        });
+
+        expect(p.pointees.length === 2);
+        expect(p.getPointee(0)).toBe('www.baidu.com');
+        expect(p.getPointee(4)).toBe('baidu.com');
+    })
+
     it("should parse name", () => {
         let buf = Buffer.alloc(15);
         buf[0] = 3;

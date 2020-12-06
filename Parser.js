@@ -65,6 +65,15 @@ class Parser {
         }
     }
 
+    getPointee(pos) {
+        for (let pointee of this.pointees) {
+            if (pointee.pos === pos) {
+                return pointee.name;
+            }
+        }
+        return "Bad Pointee";
+    }
+
     parse_query_name() {
         let labels = [];
         let positions = [];
