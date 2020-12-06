@@ -74,7 +74,7 @@ describe("Parser", () => {
         buf[14] = 0;
 
         let p = new Parser(buf);
-        expect(p.parse_query_name()).toEqual(['www', 'baidu', 'com']);
+        expect(p.parse_query_name()).toEqual('www.baidu.com');
     })
 
     it("should parse query", () => {

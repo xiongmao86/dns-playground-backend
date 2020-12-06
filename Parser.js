@@ -4,6 +4,7 @@ class Parser {
     constructor(buffer) {
         this.buffer = buffer;
         this.i = 0;
+        this.pointees = [];
     }
 
     bufferLength() {
@@ -66,13 +67,24 @@ class Parser {
 
     parse_query_name() {
         let labels = [];
+        let positions = [];
         while(true) {
+            let pos = this.i;
             let n = this.readUInt8();
             if (n === 0) break;
             let label = this.parse_query_label(n);
             labels.push(label);
+            positions.push(pos);
         }
-        return labels;
+        let name="";
+        for(let i = positions.length - 1; i >= 0; i--) {
+            name = labels.slice(i, positions.length).join(".");
+            this.pointees.push({
+                pos: positions[i],
+                name
+            })
+        }
+        return name;
     }
 
     parse_name_pointer() {
@@ -107,7 +119,7 @@ class Parser {
     }
 
     parse_query() {
-        let qname = this.parse_query_name().join('.');
+        let qname = this.parse_query_name();
         let qtype = this.parse_type();
         let qclass = this.parse_class();
 
@@ -119,15 +131,24 @@ class Parser {
         };
     }
 
-    // parse_resource_record() {
-    //     let rname = this.parse_query_name().join('.');
-    //     let rtype = this.parse_type();
-    //     let rclass = this.parse_class();
-    //     let ttl = this.readUInt32();
-    //     let rd_length = this.readUInt16();
+    parse_resource_record() {
+        let rname = this.parse_query_name();
+        let rtype = this.parse_type();
+        let rclass = this.parse_class();
+        let ttl = this.readUInt32();
+        let rd_length = this.readUInt16();
 
-    //     let rdata = this.buffer.slice(this.i, this.i + rd_length)
-    // }
+        let rdata = this.getRange(rd_length);
+
+        return {
+            name: rname,
+            type: rtype,
+            klass: rclass,
+            time_to_live: ttl,
+            data_length: rd_length,
+            rdata
+        }
+    }
 
     parse_id() {
         return "0x" + this.readUInt16().toString(16).padStart(4, '0');
