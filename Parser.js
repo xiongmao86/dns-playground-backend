@@ -87,16 +87,22 @@ class Parser {
         }
     }
 
+    parse_class() {
+        let klass = this.readUInt16();
+        if (klass === 1) return "IN";
+        else return "UNKNOWN";
+    }
+
     parse_query() {
         let qname = this.parse_query_name().join('.');
         let qtype = this.parse_type();
-        let qclass = this.readUInt16();
+        let qclass = this.parse_class();
 
         return {
             name: qname,
             // will translate with type name
             type: qtype,
-            klass: qclass == 1 ? "IN" : qclass
+            klass: qclass
         };
     }
 

@@ -112,4 +112,9 @@ describe("Parser", () => {
         let type_cname = Buffer.from([0x00, 0x05]);
         expect(new Parser(type_cname).parse_type()).toBe('CNAME');
     })
+
+    it("should parse class", () => {
+        let class_in = Buffer.from([0x00, 0x01]);
+        expect(new Parser(class_in).parse_class()).toBe("IN");
+    })
 })
