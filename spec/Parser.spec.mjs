@@ -74,7 +74,7 @@ describe("Parser", () => {
             name: 'baidu.com'
         });
 
-        expect(p.pointees.length === 2);
+        expect(p.pointees.length).toBe(2);
         expect(p.getPointee(0)).toBe('www.baidu.com');
         expect(p.getPointee(4)).toBe('baidu.com');
     })
@@ -91,6 +91,24 @@ describe("Parser", () => {
 
         let p = new Parser(buf);
         expect(p.parse_query_name()).toEqual('www.baidu.com');
+    })
+
+    it("should update pointees", () => {
+        let buf = Buffer.alloc(15);
+        buf[0] = 3;
+        buf.write('www', 1, 'ascii');
+        buf[4] = 5;
+        buf.write('baidu',5, 'ascii');
+        buf[10] = 3;
+        buf.write('com', 11, 'ascii');
+        buf[14] = 0;
+        let p = new Parser(buf);
+        p.parse_query_name();
+
+        expect(p.pointees.length).toBe(3);
+        expect(p.getPointee(0)).toBe('www.baidu.com');
+        expect(p.getPointee(4)).toBe('baidu.com');
+        expect(p.getPointee(10)).toBe('com');
     })
 
     it("should parse query", () => {
