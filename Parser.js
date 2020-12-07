@@ -84,7 +84,16 @@ class Parser {
 
         let labels = [];
         let positions = [];
+        let pointer_name = null;
         while(true) {
+            // process pointer if current name is compressed.
+            let peek = this.peekUInt8();
+            let end_with_pointer = ( (peek & 0xc0) === 0xc0 );
+            if (end_with_pointer) {
+                pointer_name = this.parse_name_pointer();
+                break;
+            }
+
             let pos = this.i;
             let n = this.readUInt8();
             if (n === 0) break;
@@ -95,6 +104,7 @@ class Parser {
         let name="";
         for(let i = positions.length - 1; i >= 0; i--) {
             name = labels.slice(i, positions.length).join(".");
+            if (pointer_name) name += affix;
             this.pointees.push({
                 pos: positions[i],
                 name
