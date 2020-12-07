@@ -136,7 +136,17 @@ describe("Parser", () => {
 
     it("should parse with pointer", () => {
         let buf = Buffer.from([0xc0, 0x0c]);
-        expect(new Parser(buf).parse_name_pointer()).toBe(0x0c);
+        let p = new Parser(buf);
+        p.pointees.push({
+            pos: 0x0c,
+            name: 'baidu.com'
+        })
+        
+        // temporary bypass pointer_limit so that 
+        // parsing should continue.
+        p.pointer_limit = 0x0d;
+
+        expect(p.parse_name_pointer()).toBe("baidu.com");
     })
 
     it("should parse type", () => {

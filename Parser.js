@@ -5,6 +5,7 @@ class Parser {
         this.buffer = buffer;
         this.i = 0;
         this.pointees = [];
+        this.pointer_limit = this.i;
     }
 
     bufferLength() {
@@ -28,6 +29,10 @@ class Parser {
         let result = this.buffer.readUInt8(this.i);
         this.i += 1;
         return result;
+    }
+
+    peekUInt8() {
+        return this.buffer.readUInt8(this.i);
     }
 
     getRange(len) {
@@ -75,6 +80,8 @@ class Parser {
     }
 
     parse_query_name() {
+        this.pointer_limit = this.i;
+
         let labels = [];
         let positions = [];
         while(true) {
@@ -97,9 +104,10 @@ class Parser {
     }
 
     parse_name_pointer() {
-        let pointer = this.readUInt16();
-        assert(pointer & 0b1100_0000_0000_0000, "should start with 0b11");
-        return pointer & 0b0011_1111_1111_1111;
+        let pointer = this.readUInt16() & 0b0011_1111_1111_1111;
+        assert(this.pointees.length > 0,
+            "Should have parsed name before using pointer");
+        return this.getPointee(pointer);
     }
 
     parse_query_label(n) {
