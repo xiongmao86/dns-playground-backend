@@ -79,7 +79,7 @@ class Parser {
         return "Bad Pointee";
     }
 
-    parse_query_name() {
+    parse_name() {
         this.pointer_limit = this.i;
 
         let labels = [];
@@ -146,7 +146,7 @@ class Parser {
     }
 
     parse_query() {
-        let qname = this.parse_query_name();
+        let qname = this.parse_name();
         let qtype = this.parse_type();
         let qclass = this.parse_class();
 
@@ -159,22 +159,32 @@ class Parser {
     }
 
     parse_resource_record() {
-        let rname = this.parse_query_name();
+        let rname = this.parse_name();
         let rtype = this.parse_type();
         let rclass = this.parse_class();
         let ttl = this.readUInt32();
         let rd_length = this.readUInt16();
 
-        let rdata = this.getRange(rd_length);
+        // let rdata = this.getRange(rd_length);
 
-        return {
+        let result = {
             name: rname,
             type: rtype,
             klass: rclass,
             time_to_live: ttl,
             data_length: rd_length,
-            rdata
+            // rdata
+        };
+
+        switch(rtype) {
+            case "CNAME":
+                result["canonical_name"] = this.parse_name();
+                break;
+            default:
+                result["rdata"] = "unrecognized";
         }
+
+        return result;
     }
 
     parse_id() {
@@ -195,6 +205,21 @@ class Parser {
             querys.push(this.parse_query());
         }
 
+        let answers = [];
+        for(let i = 0; i < answer_count; i++) {
+            answers.push(this.parse_resource_record());
+        }
+
+        let authoritative_nameservers = [];
+        for(let i = 0; i < authority_count; i++) {
+            authoritative_nameservers.push(this.parse_resource_record());
+        }
+
+        let additional_records = [];
+        for(let i = 0; i < additional_information_count; i++) {
+            additional_records.push(this.parse_resource_record());
+        }
+
         return {
             id,
             flags,
@@ -202,7 +227,10 @@ class Parser {
             answer_count,
             authority_count,
             additional_information_count,
-            querys
+            querys,
+            answers,
+            authoritative_nameservers,
+            additional_records
         }
     }
 }
