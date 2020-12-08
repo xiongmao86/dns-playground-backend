@@ -43,6 +43,27 @@ class Parser {
         return result;
     }
 
+    getPointee(pos) {
+        for (let pointee of this.pointees) {
+            if (pointee.pos === pos) {
+                return pointee.name;
+            }
+        }
+        // assert(false, `${pos} should be a valid name segment`);
+        return 'bad pointee';
+    }
+
+    updatePointees(labels, poss, pointer_name) {
+        for (let i = labels.length - 1; i >= 0; i--) {
+            let join = labels.slice(i, labels.length).join('.');
+            if (pointer_name) join += ('.' + pointer_name);
+            this.pointees.push({
+                pos: poss[i],
+                name: join
+            })
+        }
+    }
+
     parse_flags() {
         let flagbits = this.readUInt16();
         let qr = flagbits >>> 15;
@@ -70,16 +91,6 @@ class Parser {
         }
     }
 
-    getPointee(pos) {
-        for (let pointee of this.pointees) {
-            if (pointee.pos === pos) {
-                return pointee.name;
-            }
-        }
-        // assert(false, `${pos} should be a valid name segment`);
-        return 'bad pointee';
-    }
-
     parse_name() {
         this.pointer_limit = this.i;
 
@@ -95,7 +106,7 @@ class Parser {
             let pos = this.i;
             let n = this.readUInt8();
             if (n === 0) break;
-            let label = this.parse_query_label(n);
+            let label = this.parse_label(n);
             labels.push(label);
             poss.push(pos);
         }
@@ -103,7 +114,7 @@ class Parser {
         // process pointers if any
         let pointer_name = "";
         if (end_with_pointer) {
-            pointer_name = this.parse_name_pointer();
+            pointer_name = this.parse_pointer();
         }
 
         // update pointees
@@ -115,18 +126,7 @@ class Parser {
             labels.join('.') + '.' + pointer_name;
     }
 
-    updatePointees(labels, poss, pointer_name) {
-        for (let i = labels.length - 1; i >= 0; i--) {
-            let join = labels.slice(i, labels.length).join('.');
-            if (pointer_name) join += ('.' + pointer_name);
-            this.pointees.push({
-                pos: poss[i],
-                name: join
-            })
-        }
-    }
-
-    parse_name_pointer() {
+    parse_pointer() {
         let pointer = this.readUInt16() & 0b0011_1111_1111_1111;
         assert(pointer < this.pointer_limit,
             "Should point to names showed up already");
@@ -135,7 +135,7 @@ class Parser {
         return this.getPointee(pointer);
     }
 
-    parse_query_label(n) {
+    parse_label(n) {
         let range = this.getRange(n);
         let label = range.toString();
         

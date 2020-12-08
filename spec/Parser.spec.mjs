@@ -105,15 +105,15 @@ describe("Parser", () => {
     it("should parse label", () => {
         let www = Buffer.from('www');
         let p1 = new Parser(www);
-        expect(p1.parse_query_label(3)).toBe('www');
+        expect(p1.parse_label(3)).toBe('www');
         
         let baidu = Buffer.from('baidu');
         let p2 = new Parser(baidu);
-        expect(p2.parse_query_label(5)).toBe('baidu');
+        expect(p2.parse_label(5)).toBe('baidu');
         
         let com = Buffer.from('com');
         let p3 = new Parser(com);
-        expect(p3.parse_query_label(3)).toBe('com');
+        expect(p3.parse_label(3)).toBe('com');
     })
     
     it("should get pointee", () => {
@@ -228,7 +228,7 @@ describe("Parser", () => {
         // parsing should continue.
         p.pointer_limit = 0x0d;
         
-        expect(p.parse_name_pointer()).toBe("baidu.com");
+        expect(p.parse_pointer()).toBe("baidu.com");
     })
     
     it("should parse type", () => {
