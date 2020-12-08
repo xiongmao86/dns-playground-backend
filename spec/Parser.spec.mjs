@@ -16,58 +16,58 @@ describe("Parser", () => {
         })
         
         // 做完以后再测试这个
-        // it("Should parse", () => {
-        //     let answer0 = {
-        //         "name": "www.baidu.com",
-        //         "type": "CNAME",
-        //         "klass": "IN",
-        //         "time_to_live": 600,
-        //         "data_length": 15,
-        //         "canonical_name": "www.a.shifen.com"
-        //     };
-        //     let answer1 = {
-        //         "name": "www.a.shifen.com",
-        //         "type": "A",
-        //         "klass": "IN",
-        //         "time_to_live": 600,
-        //         "data_length": 4,
-        //         "rdata": "unrecognized"
-        //     };
-        //     expect(result.answers.length).toBe(3);
-        //     expect(result.answers[0]).toEqual(answer0);
-        //     expect(result.answers[1]).toEqual(answer1);
+        it("Should parse", () => {
+            let answer0 = {
+                "name": "www.baidu.com",
+                "type": "CNAME",
+                "klass": "IN",
+                "time_to_live": 600,
+                "data_length": 15,
+                "canonical_name": "www.a.shifen.com"
+            };
+            let answer1 = {
+                "name": "www.a.shifen.com",
+                "type": "A",
+                "klass": "IN",
+                "time_to_live": 600,
+                "data_length": 4,
+                "address": "14.215.177.38"
+            };
+            expect(result.answers.length).toBe(3);
+            expect(result.answers[0]).toEqual(answer0);
+            expect(result.answers[1]).toEqual(answer1);
             
-        //     let nameserver = {
-        //         "name": "a.shifen.com",
-        //         "type": "UNKNOWN",
-        //         "klass": "IN",
-        //         "time_to_live": 205,
-        //         "data_length": 6,
-        //         "rdata": "unrecognized"
-        //     };
-        //     expect(result.authoritative_nameservers.length).toBe(5);
-        //     expect(result.authoritative_nameservers[0]).toEqual(nameserver)
+            let nameserver = {
+                "name": "a.shifen.com",
+                "type": "NS",
+                "klass": "IN",
+                "time_to_live": 205,
+                "data_length": 6,
+                "nameserver": "ns3.a.shifen.com"
+            };
+            expect(result.authoritative_nameservers.length).toBe(5);
+            expect(result.authoritative_nameservers[0]).toEqual(nameserver)
             
-        //     let additional1 = {
-        //         "name": "ns1.a.shifen.com",
-        //         "type": "A",
-        //         "klass": "IN",
-        //         "time_to_live": 466,
-        //         "data_length": 4,
-        //         "rdata": "unrecognized"
-        //     };
-        //     let additional2 = {
-        //         "name": "ns5.a.shifen.com",
-        //         "type": "A",
-        //         "klass": "IN",
-        //         "time_to_live": 353,
-        //         "data_length": 4,
-        //         "address": "180.76.76.95"
-        //     };
-        //     expect(result.additional_records.length).toBe(5);
-        //     expect(result.additional_records[0]).toEqual(additional1);
-        //     expect(result.additional_records[4]).toEqual(additional2);
-        // })
+            let additional0 = {
+                "name": "ns1.a.shifen.com",
+                "type": "A",
+                "klass": "IN",
+                "time_to_live": 466,
+                "data_length": 4,
+                "address": "61.135.165.224"
+            };
+            let additional4 = {
+                "name": "ns5.a.shifen.com",
+                "type": "A",
+                "klass": "IN",
+                "time_to_live": 353,
+                "data_length": 4,
+                "address": "180.76.76.95"
+            };
+            expect(result.additional_records.length).toBe(5);
+            expect(result.additional_records[0]).toEqual(additional0);
+            expect(result.additional_records[4]).toEqual(additional4);
+        })
     })
     
     it("should parse counts", () => {
