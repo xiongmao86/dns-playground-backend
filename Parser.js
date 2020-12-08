@@ -81,7 +81,6 @@ class Parser {
     }
 
     parse_name() {
-        debugger;
         this.pointer_limit = this.i;
 
         // parse labels if any
@@ -107,9 +106,10 @@ class Parser {
             pointer_name = this.parse_name_pointer();
         }
 
-        console.log(labels);
+        // update pointees
         this.updatePointees(labels, poss, pointer_name);
 
+        // return parsed name
         return labels.length === 0? pointer_name :
             pointer_name === ""? labels.join('.') :
             labels.join('.') + '.' + pointer_name;
