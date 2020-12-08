@@ -230,6 +230,12 @@ describe("Parser", () => {
         
         expect(p.parse_pointer()).toBe("baidu.com");
     })
+
+    it("should parse address", () => {
+        let buf = Buffer.from([0x0e, 0xd7, 0xb1, 0x26]);
+        let res = new Parser(buf).parse_address();
+        expect(res).toBe('14.215.177.38');
+    })
     
     it("should parse type", () => {
         let type_a = Buffer.from([0x00, 0x01]);

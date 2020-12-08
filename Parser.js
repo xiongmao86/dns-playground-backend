@@ -173,12 +173,44 @@ class Parser {
         };
     }
 
+    parse_address() {
+        let segs = [];
+        for (let i = 0; i < 4; i++) {
+            segs.push(this.readUInt8().toString());
+        }
+        return segs.join('.');
+    }
+
+    parse_rdata(type, rd_length) {
+        switch(type) {
+            case 'A':
+                return this.parse_address();
+            case 'CNAME':
+                return this.parse_name();
+            default:
+                this.i += rd_length;
+                return 'unrecognized';
+        }
+    }
+
+    get_rdata_key(type) {
+        switch(type) {
+            case 'A':
+                return 'address';
+            case 'CNAME':
+                return 'canonical_name';
+            default:
+                return 'rdata';
+        }
+    }
+
     parse_resource_record() {
         let rname = this.parse_name();
         let rtype = this.parse_type();
         let rclass = this.parse_class();
         let ttl = this.readUInt32();
         let rd_length = this.readUInt16();
+        let rdata = this.parse_rdata(rtype, rd_length);
 
         let result = {
             name: rname,
@@ -186,17 +218,8 @@ class Parser {
             klass: rclass,
             time_to_live: ttl,
             data_length: rd_length,
-            // rdata
         };
-
-        switch(rtype) {
-            case "CNAME":
-                result["canonical_name"] = this.parse_name();
-                break;
-            default:
-                result["rdata"] = "unrecognized";
-                this.i += rd_length;
-        }
+        result[this.get_rdata_key(rtype)] = rdata;
 
         return result;
     }
