@@ -142,24 +142,6 @@ class Parser {
         return label;
     }
 
-    parse_type() {
-        let type = this.readUInt16();
-        switch(type) {
-            case 1:
-                return "A";
-            case 5:
-                return "CNAME";
-            default:
-                return "UNKNOWN";
-        }
-    }
-
-    parse_class() {
-        let klass = this.readUInt16();
-        if (klass === 1) return "IN";
-        else return "UNKNOWN";
-    }
-
     parse_query() {
         let qname = this.parse_name();
         let qtype = this.parse_type();
@@ -181,10 +163,33 @@ class Parser {
         return segs.join('.');
     }
 
+    parse_class() {
+        let klass = this.readUInt16();
+        if (klass === 1) return "IN";
+        else return "UNKNOWN";
+    }
+
+    parse_type() {
+        let type = this.readUInt16();
+        switch(type) {
+            case 1:
+                return 'A';
+            case 2:
+                return 'NS'
+            case 5:
+                return 'CNAME';
+            default:
+                return 'UNKNOWN';
+        }
+    }
+
+
     parse_rdata(type, rd_length) {
         switch(type) {
             case 'A':
                 return this.parse_address();
+            case 'NS':
+                return this.parse_name();
             case 'CNAME':
                 return this.parse_name();
             default:
@@ -197,6 +202,8 @@ class Parser {
         switch(type) {
             case 'A':
                 return 'address';
+            case 'NS':
+                return 'nameserver';
             case 'CNAME':
                 return 'canonical_name';
             default:
