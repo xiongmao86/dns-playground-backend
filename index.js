@@ -1,4 +1,6 @@
 import express from 'express'
+import fs from 'fs'
+import Parser from './Parser.js'
 
 const app = express();
 const port = 3000;
@@ -145,5 +147,12 @@ app.get('/default', (req, resp) => {
   resp.header('Access-Control-Allow-Origin', '*');
   resp.json(pack)
 });
+
+app.get('/parse', (req, resp) => {
+  resp.header('Access-Control-Allow-Origin', '*');
+  const binData = fs.readFileSync('./dns_query.binary');
+  let result = new Parser(binData).parse();
+  resp.json(result);
+})
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`));
