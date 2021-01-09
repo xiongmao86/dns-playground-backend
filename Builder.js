@@ -114,13 +114,51 @@ class Builder {
         return this.setField(arcount, 'arcount', this.invalidUnsigned16Bit);
     }
 
-    invalidName() {
-        //TODO update name constraint
-        return false;
+    includeLabelTooLong(nameStr) {
+        let labels = nameStr.split('.');
+        for(let label of labels) {
+            if (label.length > 63) {
+                return {
+                    tooLong: true,
+                    label: label
+                };
+            }
+        }
+        return { tooLong: false, label: null};
+    }
+
+    domainNameTooLong(nameStr) {
+        /* Consideration: 
+         * I have doubts about the number name string 
+         * should be checking.
+         * 
+         * 1. The limit specify in rfc1035 is 255, should I 
+         * change it to 254 because names should end with domain
+         * root which is represented as an octet of 0?
+         * 
+         * 2. Message compression can be applied to qname if the 
+         * packet contains 2 or more querys. Simply checking 
+         * against a number would make those donmain names
+         * that are longer than limit but are capable to 
+         * be compressed as shorter name under limit will
+         * forbid to use.
+         */
+        return nameStr.length > 254;
+    }
+
+    setDomainName(str, fieldName) {
+        let r = this.includeLabelTooLong(str);
+        if(r.tooLong) {
+            this.errors.push(`length of ${r.label} is longer than 63`);
+        } else if(this.domainNameTooLong(str)) {
+            this.errors.push(`${str} is too long`);
+        } else {
+            this[fieldName] = str;
+        }
     }
 
     set_qname(qname) {
-        return this.setField(qname, 'qname', this.invalidName);
+        return this.setDomainName(qname, 'qname');
     }
 
     set_qtype(qtype) {

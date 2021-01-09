@@ -34,4 +34,20 @@ describe("Builder", () => {
 
         b.setField(0, 'qr', b.invalid1Bit);
     })
+
+    it("should not set invalid labels", () => {
+        const digit10 = "1234567890";
+        const digit30 = `${digit10}${digit10}${digit10}`;
+        // label.length should < 64;
+        const badLabel = `${digit30}${digit30}1234`;
+        const badName = `${badLabel}.baidu.com`;
+        
+        b.setDomainName(badName, "qname");
+        expect(b.errors.length).toBe(1);
+        expect(b.errors[0]).toEqual(`length of ${badLabel} is longer than 63`);
+        expect(b.qname).toEqual('');
+
+        b.setDomainName('www.baidu.com', "qname");
+        expect(b.qname).toEqual('www.baidu.com');
+    })
 })
