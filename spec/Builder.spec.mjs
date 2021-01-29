@@ -50,4 +50,26 @@ describe("Builder", () => {
         b.setDomainName('www.baidu.com', "qname");
         expect(b.qname).toEqual('www.baidu.com');
     })
+
+    it("should build header id", () => {
+        const compare = Buffer.from([0x86, 0x7f]);
+        b.set_id(0x867f);
+        expect(b.build_id()).toEqual(compare);
+    })
+
+    it("should build flags", () => {
+        const compare = Buffer.from([0x81, 0x80]);
+        b.set_qr(1);
+        b.set_opcode(0);
+        b.set_aa(0);
+        b.set_tc(0);
+        b.set_rd(1);
+        b.set_ra(1);
+        b.set_ad(0);
+        b.set_cd(0);
+        b.set_rcode(0);
+        expect(b.build_flags()).toEqual(compare);
+    })
+
+    
 })
