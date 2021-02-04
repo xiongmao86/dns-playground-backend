@@ -27,7 +27,7 @@ class Builder {
         
         // query
         this.qname = "";
-        this.qtype = 0;
+        this.qtype = 1;
         this.qclass = 1;
         
         return this;
@@ -183,13 +183,10 @@ class Builder {
     
     // The data struct which is used in udp socket send fucntion
     // should be the end result of this function.
-    build() {
-        // let r = new Buffer();
-        
-        // 1. build Header
-        // 2. build Questions
-        // 3. assemble Headers and Questions
-        // 4. return result buffer
+    build() {  
+        const header = this.build_header();
+        const query = this.build_query();
+        return Buffer.concat([header, query]);
     }
     
     build_header() {
@@ -243,6 +240,29 @@ class Builder {
         i |= this.rcode;
         r.writeUInt16BE(i);
         return r;
+    }
+    
+    build_query() {
+        const qname = this.build_qname(this.qname);
+        const qtype = this.buildUInt16(this.qtype);
+        const qclass = this.buildUInt16(this.qclass);
+        return Buffer.concat([qname, qtype, qclass]);
+    }
+
+    build_qname(qname) {
+        let labels = qname.split('.');
+        let list = [];
+        for(let label of labels) {
+            list.push(this.build_label(label));
+        }
+        list.push(Buffer.from([0x00]));
+        return Buffer.concat(list);
+    }
+
+    build_label(label) {
+        let len = Buffer.from([label.length]);
+        let str = Buffer.from(label);
+        return Buffer.concat([len, str]);
     }
 }
 

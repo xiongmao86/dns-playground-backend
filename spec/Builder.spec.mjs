@@ -71,5 +71,22 @@ describe("Builder", () => {
         expect(b.build_flags()).toEqual(compare);
     })
 
-    
+    it("should build label", () => {
+        const www = Buffer.from('www');
+        const len = Buffer.from([3]);
+        const compare = Buffer.concat([len, www]);
+        expect(b.build_label('www')).toEqual(compare);
+    })
+
+    it("should build qname", () => {
+        const name = "www.baidu.com";
+        const list = [
+            Buffer.from([0x03]), Buffer.from("www"),
+            Buffer.from([0x05]), Buffer.from("baidu"),
+            Buffer.from([0x03]), Buffer.from("com"),
+            Buffer.from([0x00])
+        ];
+
+        expect(b.build_qname(name)).toEqual(Buffer.concat(list));
+    })
 })
