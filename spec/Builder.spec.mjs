@@ -89,4 +89,15 @@ describe("Builder", () => {
 
         expect(b.build_qname(name)).toEqual(Buffer.concat(list));
     })
+
+    it("should setup by from", () => {
+        let obj = {
+            id: 1,
+            qr: 1
+        };
+        b.from(obj);
+        expect(b.id).toBe(1);
+        expect(b.qr).toBe(1);
+        expect(b.opcode).toBe(0);
+    })
 })

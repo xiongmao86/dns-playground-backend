@@ -33,6 +33,47 @@ class Builder {
         return this;
     }
     
+    // assign from json
+    from(obj) {
+        if (obj.id) 
+            this.set_id(obj.id);
+
+        if (obj.qr)
+            this.set_qr(obj.qr);
+        if (obj.opcode)
+            this.set_opcode(obj.opcode);
+        if (obj.aa)
+            this.set_aa(obj.aa);
+        if (obj.tc)
+            this.set_tc(obj.tc);
+        if (obj.rd)
+            this.set_rd(obj.rd);
+        if (obj.ra)
+            this.set_ra(obj.ra);
+        if (obj.ad)
+            this.set_ad(obj.ad);
+        if (obj.cd)
+            this.set_cd(obj.cd);
+        if (obj.rcode)
+            this.set_rcode(obj.rcode);
+
+        if (obj.qdcount)
+            this.set_qdcount(obj.qdcount);
+        if (obj.ancount)
+            this.set_ancount(obj.ancount);
+        if (obj.nscount)
+            this.set_nscount(obj.nscount);
+        if (obj.arcount)
+            this.set_arcount(obj.arcount);
+        
+        if (obj.qname)
+            this.set_qname(obj.qname);
+        if (obj.qtype)
+            this.set_qtype(obj.qtype);
+        if (obj.qclass)
+            this.set_qclass(obj.qclass);
+    }
+
     addOutOfRange(name) {
         this.errors.push(`${name} is out of range`);
     }
