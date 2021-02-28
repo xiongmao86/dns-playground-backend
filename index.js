@@ -1,6 +1,8 @@
 import express from 'express'
 import fs from 'fs'
 import Parser from './Parser.js'
+import Builder from './Builder'
+import dgram from 'dgram'
 
 const app = express();
 const port = 3000;
@@ -156,11 +158,38 @@ app.get('/parse', (req, resp) => {
 })
 
 app.post('/send', (req, resp) => {
+  // 1. receive post request
   resp.header('Access-Control-Allow-Origin', '*');
   let {packet, ip} = JSON.parse(req.body);
-  //udp send
-  //parse response
-  //send to frontend
+
+  // 2. build binary buffer
+  let b = new Builder();
+  let buf = b.from(packet).build();
+
+  // 3. send buffer to dns server
+  let client = dgram.createSocket('udp4');
+  client.send(buf, 53, ip, (err) => {
+    client.close();
+  });
+
+  // 4. received packets from dns server
+  let packs = [];
+  let received_buf;
+  client.on("message", (msg, rinfo) => {
+    if (rinfo.address === ip && rinfo.port === 53) {
+      packs.push(msg);
+    }
+  });
+
+  // 5. get complete response
+  let result;
+  client.on("close", () => {
+    received_buf = Buffer.concat(packs);
+    result = new Parser(received_buf).parse();
+    packs = [];
+    resp.json(result);
+    client.close();
+  });
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`));
