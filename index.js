@@ -8,7 +8,7 @@ const port = 3000;
 const pack = {
     "id": '0x867f',
     "flags": {
-      "response": 0, // should be 1, seting 0 to test store getter
+      "response": 1,
       "opcode": 0x0000,
       "authoritative": 0,
       "truncated": 0,
@@ -153,6 +153,14 @@ app.get('/parse', (req, resp) => {
   const binData = fs.readFileSync('./dns_query.binary');
   let result = new Parser(binData).parse();
   resp.json(result);
+})
+
+app.post('/send', (req, resp) => {
+  resp.header('Access-Control-Allow-Origin', '*');
+  let {packet, ip} = JSON.parse(req.body);
+  //udp send
+  //parse response
+  //send to frontend
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`));
