@@ -1,11 +1,14 @@
 import express from 'express'
 import fs from 'fs'
 import Parser from './Parser.js'
-import Builder from './Builder'
+import Builder from './Builder.js'
 import dgram from 'dgram'
 
 const app = express();
 const port = 3000;
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
 const pack = {
     "id": '0x867f',
@@ -158,9 +161,9 @@ app.get('/parse', (req, resp) => {
 })
 
 app.post('/send', (req, resp) => {
-  // 1. receive post request
   resp.header('Access-Control-Allow-Origin', '*');
-  let {packet, ip} = JSON.parse(req.body);
+  // 1. receive post request
+  let {packet, ip} = req.body;
 
   // 2. build binary buffer
   let b = new Builder();
