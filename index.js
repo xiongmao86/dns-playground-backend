@@ -161,26 +161,29 @@ app.get('/parse', (req, resp) => {
 })
 
 app.post('/send', (req, resp) => {
-  resp.header('Access-Control-Allow-Origin', '*');
   // 1. receive post request
   let {packet, ip} = req.body;
-
+  
   // 2. build binary buffer
   let b = new Builder();
   let buf = b.from(packet).build();
-
+  
   // 3. send buffer to dns server
   let client = dgram.createSocket('udp4');
-  client.send(buf, 53, ip, (err) => {
-    client.close();
+  client.send(buf, 53, ip, (err, bytes) => {
+    if (err) {
+      console.log("Send error");
+      client.close();
+    }
   });
-
+  
   // 4. received packets from dns server
   let packs = [];
   let received_buf;
   client.on("message", (msg, rinfo) => {
     if (rinfo.address === ip && rinfo.port === 53) {
       packs.push(msg);
+      client.close();
     }
   });
 
@@ -190,9 +193,19 @@ app.post('/send', (req, resp) => {
     received_buf = Buffer.concat(packs);
     result = new Parser(received_buf).parse();
     packs = [];
+    resp.header('Access-Control-Allow-Origin', '*');
     resp.json(result);
-    client.close();
   });
 })
+
+// preflight response TODO needs further investigation
+app.all('*', (req, resp, next) => {
+  resp.set('Access-Control-Allow-Origin', '*');
+  resp.set('Access-Control-Allow-Headers', "content-type");
+  if (req.method=="OPTIONS") {
+    return resp.sendStatus(204);
+  }
+  next();
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`));
