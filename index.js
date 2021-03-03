@@ -148,14 +148,11 @@ const pack = {
     ]
   } // finish pack object
 
-app.get('/default', (req, resp) => {
-  // temporarily bypass cors.
-  resp.header('Access-Control-Allow-Origin', '*');
+app.get('/default', cors(), (_req, resp) => {
   resp.json(pack)
 });
 
-app.get('/parse', (req, resp) => {
-  resp.header('Access-Control-Allow-Origin', '*');
+app.get('/parse', cors(), (_req, resp) => {
   const binData = fs.readFileSync('./dns_query.binary');
   let result = new Parser(binData).parse();
   resp.json(result);
@@ -194,7 +191,6 @@ app.post('/send', cors(), (req, resp) => {
     received_buf = Buffer.concat(packs);
     result = new Parser(received_buf).parse();
     packs = [];
-    resp.header('Access-Control-Allow-Origin', '*');
     resp.json(result);
   });
 })
