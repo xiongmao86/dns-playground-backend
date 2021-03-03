@@ -1,8 +1,9 @@
-import express from 'express'
 import fs from 'fs'
+import dgram from 'dgram'
+import express from 'express'
+import cors from 'cors'
 import Parser from './Parser.js'
 import Builder from './Builder.js'
-import dgram from 'dgram'
 
 const app = express();
 const port = 3000;
@@ -160,7 +161,7 @@ app.get('/parse', (req, resp) => {
   resp.json(result);
 })
 
-app.post('/send', (req, resp) => {
+app.post('/send', cors(), (req, resp) => {
   // 1. receive post request
   let {packet, ip} = req.body;
   
@@ -198,14 +199,6 @@ app.post('/send', (req, resp) => {
   });
 })
 
-// preflight response TODO needs further investigation
-app.all('*', (req, resp, next) => {
-  resp.set('Access-Control-Allow-Origin', '*');
-  resp.set('Access-Control-Allow-Headers', "content-type");
-  if (req.method=="OPTIONS") {
-    return resp.sendStatus(204);
-  }
-  next();
-});
+app.options('/send', cors());
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`));
