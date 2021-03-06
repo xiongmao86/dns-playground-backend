@@ -11,6 +11,8 @@ const port = 3000;
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+let client = dgram.createSocket('udp4');
+
 const pack = {
     "id": '0x867f',
     "flags": {
@@ -167,32 +169,28 @@ app.post('/send', cors(), (req, resp) => {
   let buf = b.from(packet).build();
   
   // 3. send buffer to dns server
-  let client = dgram.createSocket('udp4');
   client.send(buf, 53, ip, (err, bytes) => {
     if (err) {
-      console.log("Send error");
-      client.close();
     }
   });
   
-  // 4. received packets from dns server
-  let packs = [];
-  let received_buf;
+  // 4. receive packet and response to newest message.
+  // Message event will trigger twice to second request, 
+  // We just need the last packet, so setting end.
+  let count = 0;
+  let end = 1;
   client.on("message", (msg, rinfo) => {
-    if (rinfo.address === ip && rinfo.port === 53) {
-      packs.push(msg);
-      client.close();
+    console.log(`${count} ${end}: ${msg.toString('hex')}`)
+    count++
+    let { address, port } = rinfo;
+    if (address === ip && port === 53 && count === end) {
+      count = 0;
+      end = end + 1;
+      let result = new Parser(msg).parse();
+      console.log("message end");
+      resp.json(result);
     }
-  });
-
-  // 5. get complete response
-  let result;
-  client.on("close", () => {
-    received_buf = Buffer.concat(packs);
-    result = new Parser(received_buf).parse();
-    packs = [];
-    resp.json(result);
-  });
+  })
 })
 
 app.options('/send', cors());
